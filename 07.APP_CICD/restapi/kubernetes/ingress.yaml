@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ffptest-com-restapi
+  namespace: infra
+  labels:
+    app: restapi
+    app.kubernetes.io/name: ffptest-com-restapi
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - host: ffptest.com
+    http:
+      paths:
+      - path: /api
+        backend:
+          serviceName: restapi
+          servicePort: 8080

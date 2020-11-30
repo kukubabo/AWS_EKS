@@ -1,0 +1,115 @@
+# NFS FS exports should be "no_root_squash"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gitlab-ce-config
+  namespace: infra
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gitlab-ce-log
+  namespace: infra
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gitlab-ce-data
+  namespace: infra
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-workspace
+  namespace: infra
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: jenkins-maven-repo
+  namespace: infra
+  annotations:
+    volume.beta.kubernetes.io/storage-class: aws-efs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: gitlab-ce
+  namespace: infra
+spec:
+  type: ClusterIP
+  selector:
+    app: gitlab-ce
+  ports:
+  - name: ssh
+    protocol: TCP
+    port: 22
+    # nodePort: 30022
+  - name: http
+    protocol: TCP
+    port: 80
+    # nodePort: 30080
+  - name: https
+    protocol: TCP
+    port: 443
+    # nodePort: 30443
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: nginx
+  labels:
+    app.kubernetes.io/name: gitlab-ce
+  name: gitlab-ce
+  namespace: infra
+spec:
+  rules:
+  - host: gitlab.ffptest.com
+    http:
+      paths:
+      - backend:
+          serviceName: gitlab-ce
+          servicePort: 80
+        path: /

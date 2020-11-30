@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-hosts
+  namespace: infra
+  labels:
+    app: gitlab-ce
+    ver: 12.10.11-ce
+    file: hosts
+data:
+  hosts: |-
+    127.0.0.1       localhost
+    # 10.102.117.180  jenkins.mwportal.com
+    # EOF
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitlab-ce
+  namespace: infra
+  labels:
+    app: gitlab-ce
+    ver: 12.10.11-ce
+    file: gitlab.rb
+data:
+  gitlab.rb: |-
+    external_url = 'gitlab.ffptest.com'
+    gitlab_rails['initial_root_password'] = "alskfl12~!"
+    # registry_external_url 'https://gitlab.mwportal.com'
+    nginx['client_max_body_size'] = '1024m'
+
+    ################################
+    # Prometheus ( External )
+    ################################
+    prometheus['enable'] = false 
+
+    #gitlab_monitor['listen_address'] = 'prometheus-server.monitoring.svc.cluster.local' 
+    #sidekiq['listen_address'] = 'prometheus-server.monitoring.svc.cluster.local' 
+    #gitlab_monitor['listen_port'] = '9168' 
+    #node_exporter['listen_address'] = 'prometheus-server.monitoring.svc.cluster.local:9100' 
+    #redis_exporter['listen_address'] = 'prometheus-server.monitoring.svc.cluster.local:9121' 
+    #postgres_exporter['listen_address'] = 'prometheus-server.monitoring.svc.cluster.local:9187' 
+    #gitaly['prometheus_listen_addr'] = "prometheus-server.monitoring.svc.cluster.local:9236" 
+    #gitlab_workhorse['prometheus_listen_addr'] = "prometheus-server.monitoring.svc.cluster.local:9229" 
+
+    #gitlab_rails['monitoring_whitelist'] = ['127.0.0.0/8', '192.168.0.1'] 
+
+    #nginx['status']['options'] = { 
+    #  "server_tokens" => "off", 
+    #  "access_log" => "off", 
+    #  "allow" => "192.168.0.1", 
+    #  "deny" => "all", 
+    #} 
+
+    ################################
+    # Others
+    ################################
+    alertmanager['enable'] = false
+    node_exporter['enable'] = false
+    redis_exporter['enable'] = false
+    postgres_exporter['enable'] = false
+    pgbouncer_exporter['enable'] = false
+    grafana['enable'] = false
+
+    # EOF

@@ -1,0 +1,39 @@
+{
+    "DomainName": "eks-skcc07715-logging",
+    "ElasticsearchVersion": "7.8",
+    "ElasticsearchClusterConfig": {
+        "InstanceType": "r5.large.elasticsearch",
+        "InstanceCount": 1,
+            "DedicatedMasterEnabled": false,
+            "ZoneAwarenessEnabled": false,
+            "WarmEnabled": false
+        },
+    "EBSOptions": {
+        "EBSEnabled": true,
+        "VolumeType": "gp2",
+        "VolumeSize": 100
+    },
+    "AccessPolicies":  "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":\"*\"},\"Action\":\"es:ESHttp*\",\"Resource\":\"arn:aws:es:ap-southeast-2:592806604814:domain/eks-skcc07715-logging/*\"}]}",
+    "SnapshotOptions": {},
+    "CognitoOptions": {
+        "Enabled": false
+    },
+    "EncryptionAtRestOptions": {
+        "Enabled": true
+    },
+    "NodeToNodeEncryptionOptions": {
+        "Enabled": true
+    },
+    "DomainEndpointOptions": {
+        "EnforceHTTPS": true,
+        "TLSSecurityPolicy": "Policy-Min-TLS-1-0-2019-07"
+    },
+    "AdvancedSecurityOptions": {
+        "Enabled": true,
+        "InternalUserDatabaseEnabled": true,
+        "MasterUserOptions": {
+            "MasterUserName": "admin",
+            "MasterUserPassword": "Sktngm12#$"
+        }
+    }
+}

@@ -1,0 +1,374 @@
+apiVersion: v1
+data:
+  # alert.rules: |-
+  #   groups:
+  #     - name: a.rules
+  #       rules:
+  alerts.rules: |-
+    groups:
+    - name: 01-k8s-core-rules
+      rules:
+      - alert: apiserver_down
+        expr: up{job="kubernetes-apiservers"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'API server unreachable'
+          description: 'API server unreachable : {{ $labels.instance }}'
+      - alert: apiserver_error_high
+        expr: rate(apiserver_request_total{code=~"^(?:5..)$"}[5m]) / rate(apiserver_request_total[5m]) * 100 > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'API server Errors High'
+          description: 'API server returns errors for {{$value}}% of requests summary: API server request errors'
+    - name: 02-k8s-ingress-rules
+      rules:
+      ######################################################################
+      # ingress controler ( 내부 / 외부 )
+      ######################################################################
+      - alert: ingress_controller_down
+        expr: up{app=~"nginx-ingress-controller.*"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Ingress Controller is down'
+          description: 'Ingress Controller is down : {{$labels.instance}}'
+      ######################################################################
+      # 값이 나오지않는 metric ( nginx_ingress_controller_ssl_expire_time_seconds )
+      ######################################################################
+      #- alert: ingress_certificate valid within_7_days
+      #  expr: ((avg(nginx_ingress_controller_ssl_expire_time_seconds) by (host) - time( )) <= (86400 * 7)) and
+      #        ((avg(nginx_ingress_controller_ssl_expire_time_seconds) by (host) - time( )) > (0))
+      #  labels:
+      #    severity: warning
+      #  annotations:
+      #    summary: SSL expire time within 7 days
+      #    description: Ingress SSL{{ $labels.host }} validity period of the certificate is within 7 days.
+      #- alert: ingress_certificate expiration
+      #  expr: (avg(nginx_ingress_controller_ssl_expire_time_seconds) by (host) - time( )) < (0)
+      #  labels:
+      #    severity: critical
+      #  annotations:
+      #    summary: SSL certificate expiration
+      #    description: ' Ingress {{ $labels.host }} SSL 인증서 만료됨 '
+      ######################################################################
+      # 값이 나오지않는 metric ( access_log_resptime )
+      ######################################################################
+      #- alert: http_access_code_5xx
+      #  expr: increase(access_log_resptime{respcode=~"5.."}[1h]) > 500
+      #  labels:
+      #    severity: warning
+      #  annotations:
+      #    summary: HTTP {{ $labels.respcode }} Error Occured
+      #    description: '업무 {{ $labels.msa_namespace }}{{ $labels.ctxroot }} 에서 잦은 HTTP 서버 오류 {{ $labels.respcode }} 발생'
+    - name: 03-k8s-node-rules
+      rules:
+      ######################################################################
+      # Node Status
+      ######################################################################
+      - alert: node_memory_pressure
+        expr: kube_node_status_condition{condition="MemoryPressure",status="true"} == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Node is under memory pressure'
+          description: 'Node is under memory pressure : {{ $labels.node }}'
+      - alert: node_disk_pressure
+        expr: kube_node_status_condition{condition="DiskPressure",status="true"} == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Node is under disk pressure'
+          description: 'Node is under disk pressure : {{ $labels.node }}'
+      - alert: node_not_ready
+        expr: kube_node_status_condition{condition="Ready",status!="true"} != 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Node status is NotReady'
+          description: 'Node status is NotReady : {{ $labels.node }}'
+      ######################################################################
+      # Node Status - CPU
+      ######################################################################
+      - alert: node_cpu_usage_over80
+        expr: (100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High CPU Usage detected'
+          description: 'High CPU Usage detected : {{ $labels.instance }} = {{ $value | humanize }}%'
+      ######################################################################
+      # Node Status - Memory
+      ######################################################################
+      - alert: node_memory_usage_high
+        expr: (node_memory_MemTotal_bytes - (node_memory_MemFree_bytes + node_memory_Cached_bytes )) / node_memory_MemTotal_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High memory usage detected'
+          description: 'High memory usage detected : {{ $labels.instance }} = {{ $value | humanize }}%'
+      ######################################################################
+      # Node Status - Paging
+      ######################################################################
+      - alert: node_vmstat_paging_rate_high
+        expr: irate(node_vmstat_pgpgin[5m]) > 1024*1024*1024
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Memory paging rate is high'
+          description: 'Memory paging rate is high : {{$labels.instance}} = {{ $value | humanize }}%'
+      ######################################################################
+      # Node Status - Disk ( Predictive )
+      ######################################################################
+      - alert: node_disk_low_root
+        expr: (node_filesystem_size_bytes{device=~".*nvme0n1p1"} - node_filesystem_free_bytes{device=~".*nvme0n1p1"}) / node_filesystem_size_bytes{device=~".*nvme0n1p1"} * 100 > 85
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Node disk low space detected'
+          description: 'Node disk low space detected : {{$labels.instance}} / Usage = {{ $value | humanize }}'
+      - alert: pvc_usage_over80
+        expr: ( kubelet_volume_stats_capacity_bytes - kubelet_volume_stats_available_bytes ) / kubelet_volume_stats_capacity_bytes * 100 > 80
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'PVC usage high'
+          description: 'PVC usage high : {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} Usage = {{ $value | humanize }}%'
+      ######################################################################
+      # Node Status - Disk Latency
+      ######################################################################
+      - alert: node_disk_read_latency
+        expr: (rate(node_disk_read_time_seconds_total[5m]) / rate(node_disk_reads_completed_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High read latency observed'
+          description: 'High read latency observed : {{ $labels.instance }} / {{ $labels.device }} has {{ $value | humanize }} read latency'
+      - alert: node_disk_write_latency
+        expr: (rate(node_disk_write_time_seconds_total[5m]) / rate(node_disk_writes_completed_total[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'High write latency observed'
+          description: 'High write latency observed : {{ $labels.instance }} / {{ $labels.device }} has {{ $value | humanize }} write latency'
+      ######################################################################
+      # Node Status - Network
+      ######################################################################
+      - alert: node_network_high_rcv_drop
+        expr: node_network_receive_drop_total{device!~"lo"} > 3000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Server has a high receive drop'
+          description: 'Server has a high receive drop : {{ $labels.instance }} / {{ $labels.device }} has {{ $value | humanize }} receive drop'
+      - alert: node_network_high_rcv_errs
+        expr: node_network_receive_errs_total{device!~"lo"} > 3000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Server has a high receive errors'
+          description: 'Server has a high receive errors : {{ $labels.instance }} / {{ $labels.device }} has {{ $value | humanize }} receive errors'
+      - alert: node_network_high_send_drop
+        expr: node_network_transmit_drop_total{device!~"lo"} > 3000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Server has a high transmit drop'
+          description: 'Server has a high transmit drop : {{ $labels.instance }} / {{ $labels.device }} has {{ $value | humanize }} transmit drop'
+      - alert: node_network_high_send_errs
+        expr: node_network_transmit_errs_total{device!~"lo"} > 3000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Server has high transmit errors'
+          description: 'Server has a high transmit errors : {{ $labels.instance }} / {{ $labels.device }} has {{ $value | humanize }} transmit errors'
+      ######################################################################
+      # Node Status - Entropy
+      ######################################################################
+      - alert: node_entropy_available_low
+        expr: node_entropy_available_bits < 300
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Node is low on entropy bits'
+          description: 'Node is low on entropy bits : {{ $labels.instance }} has {{ $value | humanize }} available entropy bits'
+      ###################################################################################
+      # Node Status - NTP time gap
+      ###################################################################################
+      - alert: node_ntp_clock_skew_high
+        expr: abs(node_time_seconds - timestamp(node_time_seconds)) > 60
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Node time is skewed'
+          description: 'Node time is skewed : {{ $labels.instance }} has {{ $value | humanize }} time difference compared to NTP server'
+    - name: 04-k8s-general-rules
+      rules:
+      ###################################################################################
+      # POD Check
+      ###################################################################################
+      - alert: pod_restarting_too_many
+        expr: increase(kube_pod_container_status_restarts_total[1h]) > 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod restarting too many'
+          description: 'Pod restarting too many : {{ $labels.namespace }}/{{ $labels.pod }}'
+      - alert: pod_status_pending
+        expr: kube_pod_status_phase{phase="Pending"} == 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod in pending status'
+          description: 'Pod in pending status : {{ $labels.namespace }}/{{ $labels.pod }} has been in pending status for more than 10 minutes'
+      - alert: pod_status_terminating
+        expr: kube_pod_status_phase{phase="Terminating"} == 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod in terminating status'
+          description: 'Pod in terminating status : {{ $labels.namespace }}/{{ $labels.pod }} has been in terminating status for more than 10 minutes'
+      - alert: pod_error_image_pull
+        expr: kube_pod_container_status_waiting_reason{reason="ErrImagePull"} == 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Pod in error status'
+          description: 'Pod in error status : {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.container }} has an Image pull error for more than 10 minutes'
+      - alert: pod_abnormally_terminated
+        expr: sum_over_time(kube_pod_container_status_terminated_reason{reason!="Completed"}[3m]) > 0
+        for: 20m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Pod abnormally terminated'
+          description: 'Pod abnormally terminated : {{ $labels.namespace }}/{{ $labels.pod }}/{{ $labels.container }}, Reason : {{ $labels.reason }}'
+      ###################################################################################
+      # Daemonset Check 
+      ###################################################################################
+      - alert: daemonsets_not_scheduled
+        expr: kube_daemonset_status_desired_number_scheduled - kube_daemonset_status_current_number_scheduled > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'DaemonSet scheduled Less than desired number'
+          description: 'DaemonSet scheduled Less than desired number : {{ $labels.namespace }}/{{ $labels.daemonset }} has only {{ $value | humanize }} pod'
+      ###################################################################################
+      # Deployment Check 
+      ###################################################################################
+      - alert: deployment_replicas_less_than_max_unavailable
+        expr: kube_deployment_status_replicas_available - kube_deployment_spec_strategy_rollingupdate_max_unavailable < 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Deployment has inssuficient replicas during a rolling update'
+          description: 'Deployment has inssuficient replicas during a rolling update : {{ $labels.namespace }}/{{ $labels.deployment }} has {{ $value | humanize }} replicas less than max unavailable '
+      ###################################################################################
+      # POD OpenFiles Check
+      ###################################################################################
+      - alert: pod_fd_usage_over80
+        expr: (process_open_fds / process_max_fds) * 100 > 80
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Too many open file detected'
+          description: 'Too many open files detected : {{ $labels.namespace }}/{{ $labels.kubernetes_pod_name }} usage over {{ $value | humanize }}%'
+      ##### Using record
+      - record: instance:fd_utilization
+        expr: process_open_fds / process_max_fds
+      - alert: pod_fd_exhaustion_predictive_4h
+        expr: predict_linear(instance:fd_utilization[1h], 3600*4) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'File descriptors will be exhausted'
+          description: 'File descriptors will be exhausted : {{ $labels.namespace }}/{{ $labels.pod }} will be exhausted within 4 hours'
+    - name: 05-prometheus-rules
+      rules:
+      - alert: prometheus_failed_reload
+        expr: prometheus_config_last_reload_successful == 0
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: 'Prometheus configuration reload has failed'
+          description: 'Prometheus configuration reload has failed'
+      - alert: prometheus_notification_queue_full_predictive_4h
+        expr: predict_linear(prometheus_notifications_queue_length[1h], 3600 * 4) > prometheus_notifications_queue_capacity
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: 'Prometheus alert notification queue will be full'
+          description: 'Prometheus alert notification queue will be full : within 4 hours'
+      - alert: prometheus_error_sending_total
+        expr: rate(prometheus_notifications_errors_total[5m]) / rate(prometheus_notifications_sent_total[5m]) * 100 > 1
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: 'Prometheus alertmanager has errors to send alerts'
+          description: 'Prometheus alertmanager has errors to send alerts : {{ $value | humanize }}%'
+      - alert: prometheus_not_connected_to_alertmanagers
+        expr: prometheus_notifications_alertmanagers_discovered{instance="localhost:9090",job="prometheus"} < 1
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: 'Prometheus is not connected to any Alertmanagers'
+          description: 'Prometheus is not connected to any Alertmanagers :  {{$labels.job }}/{{$labels.instance}}'
+      - alert: prometheus_node_exporter_down
+        expr: up{component=~"node-exporter.*"} != 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Prometheus node-exporter is downed'
+          description: 'Prometheus node-exporter is downed : {{ $labels.instance }}'
+      - alert: prometheus_pushgateway_down
+        expr: up{job="prometheus-pushgateway"} != 1
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: 'Prometheus pushgateway cannot be scraped'
+          description: 'Prometheus pushgateway cannot be scraped :  {{ $labels.instance }}'
+kind: ConfigMap
+metadata:
+  labels:
+    app: prometheus
+    app.kubernetes.io/managed-by: Helm
+    chart: prometheus-11.16.9
+    component: server
+    heritage: Helm
+    release: prometheus
+  name: prometheus-alerts
+  namespace: prometheus

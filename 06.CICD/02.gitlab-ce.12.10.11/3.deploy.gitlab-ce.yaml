@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab-ce
+  namespace: infra
+  labels:
+    app: gitlab-ce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab-ce
+  template:
+    metadata:
+      labels:
+        app: gitlab-ce
+    spec:
+      hostAliases:
+      - ip: 10.102.117.180
+        hostnames:
+        - jenkins.ffptest.com
+      containers:
+      - name: gitlab-ce
+        ports:
+          - containerPort: 22
+            name: ssh
+          - containerPort: 80
+            name: http
+          - containerPort: 443
+            name: https
+        image: gitlab/gitlab-ce:12.10.11-ce.0
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - name: config
+          mountPath: /etc/gitlab
+        - name: log
+          mountPath: /var/log/gitlab
+        - name: data
+          mountPath: /var/opt/gitlab
+        - name: gitlab-rb
+          mountPath: /etc/gitlab/gitlab.rb # /etc/gitlab/gitlab -> gitlab.rb
+          subPath: gitlab.rb
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: gitlab-ce-config
+      - name: log
+        persistentVolumeClaim:
+          claimName: gitlab-ce-log
+      - name: data
+        persistentVolumeClaim:
+          claimName: gitlab-ce-data
+      - name: gitlab-rb
+        configMap:
+          name: gitlab-ce
+          defaultMode: 0666
