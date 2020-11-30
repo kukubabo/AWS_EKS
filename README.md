@@ -19,7 +19,8 @@ EKS 클러스터 구성
 ```
 
 # 1.Bastion 서버 구성
-## 1.1. Bastion 서버(EC2) 생성
+## 1.1. Bastion 서버(EC2) 생성 및 접속
+### 1.1.1. Bastion 서버(EC2) 생성
     1. EC2 메뉴에서 "인스턴스 시작"
     2. AMI 선택 메뉴에서 Amazon Linux 2 선택
     3. 인스턴스 유형 선택 메뉴에서 "t2.micro" 선택 - 사양 최소로 해도 됨
@@ -31,6 +32,13 @@ EKS 클러스터 구성
     8. 검토 및 시작에서 정보 확인(형식적으로;;)하고 "시작하기" 클릭
        - 키 페어 선택 창이 뜨면 "새 키 페어 생성" 선택하고 키 페어 이름 입력(ex. skcc07715)후 다운로드 후 "인스턴스 시작" 클릭하여 생성
        - 기존에 생성해 둔 키 페어가 있을 경우 "기존 키 페어 선택" 선택하고 키 페어 정보 선택한 뒤 "인스턴스 시작" 클릭하여 생성
+### 1.1.2. Bastion 서버(EC2) 접속(mobaxterm 사용)
+    1. https://mobaxterm.mobatek.net/download-home-edition.html 에서 아무 버전(Portable or Installer)다운로드 및 설치(Installer 버전)
+    2. AWS 콘솔에서 EC2에서 생성한 Bastion 서버의 Public IP 복사
+    3. mobaxterm 실행 후 "Session" 아이콜 클릭 후 SSH 클릭
+    4. Remote host : "Bastion 서버 IP 주소" 입력
+    5. Specify username 체크 후 : "ec2-user" 입력
+    6. Advanced SSH settings 에서 Use private key 체크 후 key 파일 경로 선택
 ## 1.2. AWS(EKS) 관리 환경 구성
 ### 1.2.1. awscli 설치
     # 다운로드 및 설치
