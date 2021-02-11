@@ -1,8 +1,8 @@
 EKS 클러스터 구성
 ```
-2020.11.16 기준
-- aws-cli : 2.1.1
-- eksctl  : 0.31.0
+2021.02.12 기준
+- aws-cli : 2.1.25
+- eksctl  : 0.37.0
 ```
 
 # 0. 작업 폴더 구분 
@@ -70,7 +70,7 @@ EKS 클러스터 구성
     aws ec2 describe-instances --filters Name=tag:Name,Values=${EC2_NAME}
     # 설정이 제대로 되었다면 bastion 서버 정보가 json 포멧으로 출력됨
 ### 1.2.4. eksctl 다운로드
-    # 2020-11-17 기준 최신 버전 : 0.31.0
+    # 2021-02-12 기준 최신 버전 : 0.37.0
     # 다운로드 및 설치
     sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C ./
     sudo mv ./eksctl /usr/local/bin
@@ -83,9 +83,9 @@ EKS 클러스터 구성
     . /etc/profile.d/bash_completion.sh
     . ~/.bash_completion
 ### 1.2.5. kubectl 다운로드
-    # 2020-11-17 기준 최신 버전 : 1.18.8
+    # 2021-02-12 기준 최신 버전 : 1.18.9
     # 다운로드 및 설치
-    curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.8/2020-09-18/bin/linux/amd64/kubectl
+    curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
     chmod 755 kubectl
     sudo mv kubectl /usr/local/bin
 
@@ -121,6 +121,8 @@ EKS 클러스터 구성
         name: {{클러스터이름}}
         region: {{리전이름}}
         version: "1.18"            # 2020-11-17 기준 최신 버전 : 1.18
+        tags:
+          ServiceName: {{서비스명}}
 
       vpc:
         cidr: {{CIDR블록설정}}      # ex. 10.15.0.0/16
