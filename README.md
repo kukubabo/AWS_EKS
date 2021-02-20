@@ -1,8 +1,8 @@
 EKS 클러스터 구성
 ```
-2021.02.12 기준
-- aws-cli : 2.1.25
-- eksctl  : 0.37.0
+2021.02.20 기준
+- aws-cli : 2.1.27
+- eksctl  : 0.38.0
 ```
 
 # 0. 작업 폴더 구분 
@@ -70,7 +70,7 @@ EKS 클러스터 구성
     aws ec2 describe-instances --filters Name=tag:Name,Values=${EC2_NAME}
     # 설정이 제대로 되었다면 bastion 서버 정보가 json 포멧으로 출력됨
 ### 1.2.4. eksctl 다운로드
-    # 2021-02-12 기준 최신 버전 : 0.37.0
+    # 2021-02-20 기준 최신 버전 : 0.38.0
     # 다운로드 및 설치
     sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C ./
     sudo mv ./eksctl /usr/local/bin
@@ -83,9 +83,9 @@ EKS 클러스터 구성
     . /etc/profile.d/bash_completion.sh
     . ~/.bash_completion
 ### 1.2.5. kubectl 다운로드
-    # 2021-02-12 기준 최신 버전 : 1.18.9
+    # 2021-02-20 기준 최신 버전 : 1.19.6
     # 다운로드 및 설치
-    curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
+    curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
     chmod 755 kubectl
     sudo mv kubectl /usr/local/bin
 
@@ -120,32 +120,67 @@ EKS 클러스터 구성
       metadata:
         name: {{클러스터이름}}
         region: {{리전이름}}
-        version: "1.18"            # 2020-11-17 기준 최신 버전 : 1.18
+        version: "1.19"            # 2020-02-20 기준 최신 버전 : 1.19
         tags:
           ServiceName: {{서비스명}}
 
-      vpc:
-        cidr: {{CIDR블록설정}}      # ex. 10.15.0.0/16
-        clusterEndpoints:
-          publicAccess: true
-          privateAccess: true
+      kubernetesNetworkConfig:
+        serviceIPv4CIDR: 10.244.0.0/17
 
-      nodeGroups: []
+      vpc:
+        #cidr: {{CIDR블록설정}}     # 네트워크 자동생성할 경우 (ex. 100.64.0.0/24)
+        subnets:
+          public:
+            {{Available Zone이름}}  # ex. ap-northeast-2a
+              id: subnet-#########  # subnet id
+            {{Available Zone이름}}  # ex. ap-northeast-2c
+              id: subnet-#########  # subnet id
+          private:
+            {{Available Zone이름}}  # ex. ap-northeast-2a
+              id: subnet-#########  # subnet id
+            {{Available Zone이름}}  # ex. ap-northeast-2c
+              id: subnet-#########  # subnet id
+        clusterEndpoints:
+          publicAccess: true        # default false
+          privateAccess: true       # default true
+
+      #privateCluster:
+      #  enabled: true               # 완전 private 하게 구성하는 옵션
+
       managedNodeGroups:
         - name: {{노드그룹이름}}     # ex. worker-node-mng
-          tags:
-            nodegroup-role: "worker"
-            managed: "true"
-          labels:
-            role: worker
           instanceType: t3.medium
-          privateNetworking: true
-          minSize: 3
+          availabilityZones:
+            - <AZ1> # 가용영역 1.
+            - <AZ2> # 가용영역 2.
           desiredCapacity: 4
+          minSize: 3
           maxSize: 5
-          volumeSize: 20
+          volumeSize: 80
           ssh:
             allow: true
+            publicKeyName: <KEY_NAME>
+          labels:
+            role: worker
+          privateNetworking: true
+          tags:
+            nodegroup-role: "worker"
+            ServiceName: <SERVICE_NAME>
+          iam:
+            withAddonPolicies:
+              imageBuilder: true
+              autoScaler: true
+              externalDNS: true
+              certManager: true
+              ebs: true
+              eks: true
+              albIngress: true
+              cloudWatch: true
+           #ami: <AMI_ID>      # custom ami
+           #maxPodsPerNode: <MAX_PODS>     # calico 사용시 110설정 ( aws cni 는 설정 X )
+           instancePrefix: <EC2_NAME_PREFIX>
+           instanceName: <EC2_NAME_TAG>
+
 
 ## 2.1. EKS 클러스터 생성
 - 클러스터와 노드 그룹을 한 번에 생성할 수도 있으나 eksctl 버전에 따라 노드 그룹 생성 오류가 발생해서 클러스터만 먼저 생성한 뒤에 노드 그룹을 생성한다.

@@ -46,7 +46,7 @@
 #   - 8) helm 설치         : helm chart 관리를 위한 cli 프로그램
 ################################################
 
-# 1. awscli 설치 ( 2020-11-16 기준 awscli 2.1.1 최신 )
+# 1. awscli 설치 ( 2021-02-20 기준 awscli 2.1.27 최신 )
 #####
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
@@ -83,7 +83,7 @@ EC2_NAME=[내 bastion 서버 Tag 의 Name(ex. skcc07715-bastion)]
 aws ec2 describe-instances --filters Name=tag:Name,Values=${EC2_NAME}
 # 설정이 제대로 되었다면 서버 정보가 json 포멧으로 출력됨
 
-# 4. eksctl 다운로드 ( 2020-11-16 기준 eksctl 0.31.0 최신 )
+# 4. eksctl 다운로드 ( 2021-02-20 기준 eksctl 0.38.0 최신 )
 #####
 sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
@@ -95,9 +95,10 @@ eksctl completion bash >> ~/.bash_completion
 . /etc/profile.d/bash_completion.sh
 . ~/.bash_completion
 
-# 5. kubectl 다운로드 ( 2020-11-16 기준 kubectl 1.18.8 최신 )
+# 5. kubectl 다운로드 ( 2021-02-20 기준 kubectl 1.19.6 최신 )
 #####
-curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.8/2020-09-18/bin/linux/amd64/kubectl
+curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
+#curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.18.9/2020-11-02/bin/linux/amd64/kubectl
 chmod 755 kubectl
 sudo mv kubectl /usr/local/bin
 
@@ -137,14 +138,14 @@ helm repo update
 
 #######################################################################################
 # EKS 클러스터 구성
-# - 2020-11-16
+# - 2021-02-20
 #   . 리전       : 시드니(ap-southeast-2) 사용           <- 개인별 수정해서 사용
 #                  => 리전별로 VPC 기본 5개 제한, NAT G/W IP 기본 5개 제한되어서
 #                     별도 신청해서 제한 개수를 늘려놓지 않은 상태라면 EKS 생성(VPC, NAT G/W IP 1개씩 필요)이 안될 수 있는데
 #                     사람들이 서울 리전에서 테스트를 많이 해서 부족할 가능성이 높기 때문에 다른 리전 선택해서 테스트하는 것을 권고
 #   . 클러스터명 : skcc07715                             <- 개인별 수정해서 사용
-#   . k8s 버전   : 1.18  (최신 버전) 사용                <- 1.16, 1.17, 1.18 중 선택
-#   . VPC        : 10.15.0.0/16 사용                     <- 개인별 수정해서 사용
+#   . k8s 버전   : 1.19  (최신 버전) 사용                <- 1.16, 1.17, 1.18, 1.19 중 선택
+#   . VPC        : 100.64.0.0/24 사용                    <- 개인별 수정해서 사용
 #   . AZ         : ap-southeast-2a, ap-southeast-2c 사용 <- 개인별 수정해서 사용(리전에 맞춰서)
 #######################################################################################
 
