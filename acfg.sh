@@ -5,8 +5,8 @@ if [ $# -eq 0 ]; then
     echo "##############################################"
     for ACCOUNT in `ls -l ~/.aws/credentials.* | awk '{print $NF}' | cut -d'.' -f3`
     do
-        #diff ~/.aws/credentials ~/.aws/credentials.${ACCOUNT} >/dev/null 2>&1
-        diff <(head -n 3 ~/.aws/credentials) <(head -n 3 ~/.aws/credentials.${ACCOUNT}) >/dev/null 2>&1
+        diff ~/.aws/credentials ~/.aws/credentials.${ACCOUNT} >/dev/null 2>&1
+        #diff <(head -n 3 ~/.aws/credentials) <(head -n 3 ~/.aws/credentials.${ACCOUNT}) >/dev/null 2>&1
         if [ $? -eq 0 ]; then
             echo "##### List Of Account ( Current : \"${ACCOUNT}\" ) ####"
             break;

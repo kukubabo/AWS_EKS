@@ -1,8 +1,9 @@
 #!/bin/bash
 
 ### SET Account Info. ##############
-MASTER_ID=123456789012
-IAMUSR_ID=IAMUSER_NAME
+MASTER_ID=716345369949
+IAMUSR_ID=p013902
+SVC_ALIAS=ssp
 ####################################
 
 if [ $# -ne 1 ]; then
@@ -26,3 +27,4 @@ echo "aws_secret_access_key = ${NEW_SAK}" >> ${AWS_DIR}/credentials
 echo "aws_session_token = ${NEW_ST}"      >> ${AWS_DIR}/credentials
 
 rm ${AWS_DIR}/getsts.rst
+cp -p ${AWS_DIR}/credentials ${AWS_DIR}/credentials.${SVC_ALIAS}
