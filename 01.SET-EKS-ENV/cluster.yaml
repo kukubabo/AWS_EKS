@@ -1,0 +1,33 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ssp-dev-as2-eks
+  region: ap-southeast-2
+  version: "1.19"
+  tags:
+    ServiceName: SSP
+    Name: ssp-dev-as2-eks
+
+kubernetesNetworkConfig:
+  serviceIPv4CIDR: 10.244.0.0/17
+
+vpc:
+#  cidr: 100.64.15.0/24
+  subnets:
+    public:
+      ap-southeast-2a:
+        id: subnet-062a1d9a0c9058156
+      ap-southeast-2c:
+        id: subnet-01a758501fd1339d8
+    private:
+      ap-southeast-2a:
+        id: subnet-014949df61ad0a228
+      ap-southeast-2c:
+        id: subnet-0555526466c08bca0
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+
+#privateCluster:
+#  enabled: true

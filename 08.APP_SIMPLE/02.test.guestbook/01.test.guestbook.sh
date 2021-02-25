@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # setting ingress host
-INGRESS_SVC=`kubectl -n infra get svc  nginx-ingress-external-controller -o json | jq -r '.status.loadBalancer.ingress[].hostname'`
-perl -pi -e "s/SET_USER_HOST/$INGRESS_SVC/g" 01-7.ingress.yaml
+#INGRESS_SVC=`kubectl -n infra get svc  nginx-ingress-external-controller -o json | jq -r '.status.loadBalancer.ingress[].hostname'`
+#perl -pi -e "s/SET_USER_HOST/$INGRESS_SVC/g" 01-7.ingress.yaml
 
 # create 'test' namespace
 #kubectl create ns test
@@ -18,9 +18,9 @@ kubectl apply -f 01-5.guestbook-controller.json
 kubectl apply -f 01-6.guestbook-service.json
 
 # create ingress
-kubectl apply -f 01-7.ingress.yaml
+#kubectl apply -f 01-7.ingress.yaml
 
-echo ""
-echo "##### TEST URL #####"
-echo "http://$INGRESS_SVC"
+#echo ""
+#echo "##### TEST URL #####"
+#echo "http://$INGRESS_SVC"
 

@@ -1,0 +1,41 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ssp-dev-as2-eks
+  region: ap-southeast-2
+
+managedNodeGroups:
+  - name: ssp-dev-as2-eks-ng-bend
+    instanceType: t3.medium
+    availabilityZones:
+      - ap-southeast-2a
+      - ap-southeast-2c
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 3
+    volumeSize: 80
+    ssh:
+      allow: true
+      publicKeyName: ds07715
+    labels:
+      role: worker
+    privateNetworking: true
+    tags:
+      nodegroup-role: "worker"
+      ServiceName: SSP
+      Name: ssp-dev-as2-eks-ng-bend
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        efs: true
+        albIngress: true
+        cloudWatch: true
+#    ami: xxx
+#    maxPodsPerNode: 110
+    instancePrefix: ssp-dev-as2
+    instanceName: ec2-bend
