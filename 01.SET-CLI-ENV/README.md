@@ -60,5 +60,11 @@ aws-cli/2.1.28 Python/3.8.8 Linux/5.4.72-microsoft-standard-WSL2 exe/x86_64.cent
 3. "보안 자격 증명" 탭 클릭
 4. "액세스 키 만들기" 버튼 클릭
    - 생성된 "액세스 키 ID"와 "비밀 액세스 키" 정보 복사(csv 파일로 다운로드 가능)
+   * 복사하지 않고 팝업 화면을 닫으면 재조회가 불가능하기 때문에 다시 생성해야 한다.
 ```
-<span style="color:orange">*복사하지 않고 팝업 화면을 닫으면 재조회가 불가능하기 때문에 다시 생성해야 한다.*</span>
+
+### 2.2. aws configure
+```
+## 2.1. 에서 생성한 "액세스 키 ID"와 "비밀 액세스 키" 값으로 aws configure 설정
+$ aws configure
+```
