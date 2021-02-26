@@ -2,7 +2,7 @@
 
 # get account alias
 if [ $# -eq 0 ]; then
-    echo "##############################################"
+    echo "################################################"
     for ACCOUNT in `ls -l ~/.aws/credentials.* | awk '{print $NF}' | cut -d'.' -f3`
     do
         diff ~/.aws/credentials ~/.aws/credentials.${ACCOUNT} >/dev/null 2>&1
@@ -13,7 +13,7 @@ if [ $# -eq 0 ]; then
         fi
     done
     ls -l ~/.aws/credentials.* | awk '{print $NF}' | cut -d'.' -f3
-    echo "##############################################"
+    echo "################################################"
 elif [ $# -eq 1 ]; then
     ls -l ~/.aws/credentials.$1 >/dev/null 2>&1
     if [ $? -ne 0 ]; then
