@@ -150,3 +150,74 @@ $ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > g
 $ chmod 700 get_helm.sh
 $ ./get_helm.sh
 ```
+
+# MFA(2차) 인증 적용된 환경에서 awscli 구성
+MFA(Multi Factor Authentication)이 적용된 환경에서는 로그인 시 2차 인증(ex. Google인증, MS Authenticator 등)을 해야 한다.
+
+awscli 환경에서도 "액세스 키 ID"와 "비밀 액세스 키"를 가지고 aws 명령 수행시 접근 거부(Access Denied) 오류가 발생한다.
+```
+## "액세스 키 ID"와 "비밀 액세스 키"로 aws configure 된 환경에서 aws 명령 수행
+$ aws s3 ls
+An error occurred (AccessDenied) when calling the ListBuckets operation: Access Denied
+```
+
+awscli 환경에서도 정상적인 명령 수행을 위해서는 인증코드를 활용하여 SessionToken(default 12시간 유지)을 받아서 credentials 에 적용해야 한다.
+```
+## aws sts get-session-token 명령을 수행하여 액세스 키 ID, 비밀 액세스 키, SessionToken 값을 생성한다.
+$ aws sts get-session-token --serial-number arn:aws:iam::123456789012:mfa/iamuserid --profile default --token-code 123456
+{
+    "Credentials": {
+        "AccessKeyId": "ABCDEFGHIJKLMOPQRSTU",
+        "SecretAccessKey": "rdblsn/P4rZFkyiy/lnTq+5j3ncT+LQgA2qmzI/1",
+        "SessionToken": "IQoJb3JpZ2luX2VjEGMaDmFwLW5vcnRoZWFzdC0yIkcwRQIgfBxUoFka7B0hDTFXo0Sgz3/JjOdZuSWYSAV/743mb+oCIQD2hgALnNuu0WcTYfsfWhaw9S8pTOgRZysAQfkzo/Z6ZirvAQh8EAIaDDcxNjM0NTM2OTk0OSIMlkZNAxhO1ama1RP8KswBY5Ia6UnaMVv0FO0lmFtFqyiXWtZOHtCaZp6K6P31MZDS+B2HRrJiqJVj3/kiBC4J/6Bg8gGNexcdQO0vRy7G+ZYYRWvEqoEDckcA9Ic7xF9BKDX9yb+bCP+DAe4NCenamYVDYkhVRMRwcYKGuFmWeWSIEE3qudHxopPxy2g2RJJnFx+D35PSG56wuaFx1RNLi6B2Algnhee3YtVhVtqiPVjz6Ym+6Ykz0RFBA5FMAv7kAR33PdCKUHCTdoXsoLYAa9TRunbuXGiMcbQqMI3a74EGOpgBwyHuq0aUlDow5TdL5ebeecFqHXllEGnL1GFlprktcffylNBaIOP+i6Z115WyUR5x3W7ojKmnzQyFZaj9TPg1WjVOG+WlxBYUtcv0LrWgJBsD3W1cE28eHtDugK3jpd66+ZWeGaYOLLwY51yAQ3DHCVtFRMIGaiWG6liP30iomGVsVIqGRji5cMaSuMMZ7g7x7XFW/z8oM54=",
+        "Expiration": "2021-03-01T07:20:45+00:00"
+    }
+}
+
+## 생성한 값들을 ~/.aws/credentials 에 별도의 profile 로 추가한다. ( ex. profile = mfa )
+$ cat ~/.aws/credentials
+[default]
+aws_access_key_id = ABCDEFGHJIKLMNOPQRST
+aws_secret_access_key = ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678901234
+[mfa]
+aws_access_key_id = ABCDEFGHIJKLMOPQRSTU
+aws_secret_access_key = rdblsn/P4rZFkyiy/lnTq+5j3ncT+LQgA2qmzI/1
+aws_session_token = IQoJb3JpZ2luX2VjEGMaDmFwLW5vcnRoZWFzdC0yIkcwRQIgfBxUoFka7B0hDTFXo0Sgz3/JjOdZuSWYSAV/743mb+oCIQD2hgALnNuu0WcTYfsfWhaw9S8pTOgRZysAQfkzo/Z6ZirvAQh8EAIaDDcxNjM0NTM2OTk0OSIMlkZNAxhO1ama1RP8KswBY5Ia6UnaMVv0FO0lmFtFqyiXWtZOHtCaZp6K6P31MZDS+B2HRrJiqJVj3/kiBC4J/6Bg8gGNexcdQO0vRy7G+ZYYRWvEqoEDckcA9Ic7xF9BKDX9yb+bCP+DAe4NCenamYVDYkhVRMRwcYKGuFmWeWSIEE3qudHxopPxy2g2RJJnFx+D35PSG56wuaFx1RNLi6B2Algnhee3YtVhVtqiPVjz6Ym+6Ykz0RFBA5FMAv7kAR33PdCKUHCTdoXsoLYAa9TRunbuXGiMcbQqMI3a74EGOpgBwyHuq0aUlDow5TdL5ebeecFqHXllEGnL1GFlprktcffylNBaIOP+i6Z115WyUR5x3W7ojKmnzQyFZaj9TPg1WjVOG+WlxBYUtcv0LrWgJBsD3W1cE28eHtDugK3jpd66+ZWeGaYOLLwY51yAQ3DHCVtFRMIGaiWG6liP30iomGVsVIqGRji5cMaSuMMZ7g7x7XFW/z8oM54=
+
+## 추가한 profile(ex. mfa)로 aws 명령 수행
+$ aws s3 ls --profile mfa
+2021-02-04 02:32:17 test1
+2021-01-29 01:48:09 test2
+```
+
+위 방식으로 매번 credentials 파일을 수동으로 바꾸는 번거로움을 덜기 위해 다음의 스크립트를 사용하여 자동으로 업데이트한다.
+``` 
+#!/bin/bash
+
+### SET Account Info. ##############
+MASTER_ID=123456789012
+IAMUSR_ID=iamuserid
+####################################
+
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 123456"
+    exit 1
+fi
+
+AWS_DIR=~/.aws
+
+sed -i '4,7d' ${AWS_DIR}/credentials
+
+aws sts get-session-token --serial-number arn:aws:iam::${MASTER_ID}:mfa/${IAMUSR_ID} --profile default --token-code $1 > ${AWS_DIR}/getsts.rst
+
+NEW_AKI=`cat ${AWS_DIR}/getsts.rst | jq -r '.Credentials.AccessKeyId'`
+NEW_SAK=`cat ${AWS_DIR}/getsts.rst | jq -r '.Credentials.SecretAccessKey'`
+NEW_ST=` cat ${AWS_DIR}/getsts.rst | jq -r '.Credentials.SessionToken'`
+
+echo "[mfa]"                              >> ${AWS_DIR}/credentials
+echo "aws_access_key_id = ${NEW_AKI}"     >> ${AWS_DIR}/credentials
+echo "aws_secret_access_key = ${NEW_SAK}" >> ${AWS_DIR}/credentials
+echo "aws_session_token = ${NEW_ST}"      >> ${AWS_DIR}/credentials
+
+rm ${AWS_DIR}/getsts.rst
+```
