@@ -7,3 +7,4 @@
 
 ## EKS 구성
 [02-1. EKS 클러스터 생성](https://github.com/kukubabo/AWS_EKS/tree/master/11.SET-EKS-ENV#eks-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EC%83%9D%EC%84%B1)
+[02-2. EKS 노드그룹 생성](https://github.com/kukubabo/AWS_EKS/tree/master/11.SET-EKS-ENV#eks-%EB%85%B8%EB%93%9C%EA%B7%B8%EB%A3%B9-%EC%83%9D%EC%84%B1)
