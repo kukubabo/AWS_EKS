@@ -105,12 +105,12 @@ aws eks update-kubeconfig --name testproject-dev-an2-eks --region ap-northeast-2
 aws eks update-kubeconfig --name testproject-dev-an2-eks --region ap-northeast-2 --role-arn arn:aws:iam::123456789012:role/testproject-dev-role-eksuser
 ```
 
-[사용자 : EKSMASTER] 생성된 ROLE은 동일 마스터 계정 내 모든 IAM 계정에서 사용 가능하기 때문에 특정 사용자만 추가하는 작업을 해준다.
-a) IAM 서비스에서 역할(ROLE) 메뉴로 들어가 생성한 ROLE(ex. testproject-d-role-eksadmin)을 선택한다.
-b) "신뢰 관계" 탭에서 신뢰할 수 있는 개체는 마스터계정 정보(계정:123456789012)가 출력되는데 "신뢰 관계 편집" 버튼을 눌러 수정해준다.
-c) Principal 에서 AWS 값에 있는 root 정보를 IAM user 명으로 수정한 뒤 "신뢰 정책 업데이트" 버튼을 눌러 저장한다. ( 여려명을 추가하려면 , 로 구분하여 추가하면 된다. )
-d) 저장 후 신뢰할 수 있는 개체가 특정 IAM 사용자로 변경된 것을 확인할 수 있다.
-예제) Principal 편집 예제
+[사용자 : EKSMASTER] 생성된 ROLE은 동일 마스터 계정 내 모든 IAM 계정에서 사용 가능하기 때문에 특정 사용자만 추가하는 작업을 해준다.  
+a) IAM 서비스에서 역할(ROLE) 메뉴로 들어가 생성한 ROLE(ex. testproject-d-role-eksadmin)을 선택한다.  
+b) "신뢰 관계" 탭에서 신뢰할 수 있는 개체는 마스터계정 정보(계정:123456789012)가 출력되는데 "신뢰 관계 편집" 버튼을 눌러 수정해준다.  
+c) Principal 에서 AWS 값에 있는 root 정보를 IAM user 명으로 수정한 뒤 "신뢰 정책 업데이트" 버튼을 눌러 저장한다. ( 여려명을 추가하려면 , 로 구분하여 추가하면 된다. )  
+d) 저장 후 신뢰할 수 있는 개체가 특정 IAM 사용자로 변경된 것을 확인할 수 있다.  
+예제) Principal 편집 예제  
 ```
 {
   "Version": "2012-10-17",
