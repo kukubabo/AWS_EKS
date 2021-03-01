@@ -1,6 +1,6 @@
 # EKS 클러스터 생성
 ## 1. 클러스터 생성을 위한 config 파일 작성
-다음의 Config File 템플릿에서 각 변수들을 환경에 맞춰 변경하고 파일을 생성한다.
+다음의 Config File 템플릿에서 각 변수들을 환경에 맞춰 변경하고 파일을 생성한다.  
 상세한 Config File Schema는 https://eksctl.io/usage/schema/ 를 참고한다.
 ```
 apiVersion: eksctl.io/v1alpha5
