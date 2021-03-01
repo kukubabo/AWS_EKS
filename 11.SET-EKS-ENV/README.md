@@ -78,7 +78,8 @@ eksctl 명령을 수행하여 클러스터를 생성한다. ( 약 25분 소요 -
 ```
 $ eksctl create cluster -f cluster.yaml
 ```
-(publicAccess를 false로 구성한 경우) EKS Control Plane을 Public에서 접근할 수 있도록 임시로 endpoint를 활성화시킨다. (외부에서 kubectl 명령 수행시 Public Access 가 허용되어야 접근 가능하다.)
+(publicAccess를 false로 구성한 경우) EKS Control Plane을 Public에서 접근할 수 있도록 임시로 endpoint를 활성화시킨다.  
+(외부에서 kubectl 명령 수행시 Public Access 가 허용되어야 접근 가능하다.)
 ```
 $ eksctl utils update-cluster-endpoints --cluster testproject-dev-an2-eks --approve --public-access
 ```
