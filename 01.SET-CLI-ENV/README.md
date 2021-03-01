@@ -38,7 +38,7 @@
 ```
 
 ## 1. awscli 설치
-```
+```bash
 ## 다운로드 및 설치
 $ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 $ unzip awscliv2.zip
