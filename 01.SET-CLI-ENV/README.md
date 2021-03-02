@@ -38,14 +38,14 @@
 ```
 
 ## 1. awscli 설치
-```bash
+```console
 ## 다운로드 및 설치
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
+$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+$ unzip awscliv2.zip
+$ sudo ./aws/install
 
 ## 기존에 설치된 awscli 를 업그레이드할 때
-sudo ./aws/install --update
+$ sudo ./aws/install --update
 
 ## 버전 확인
 $ aws --version
@@ -64,7 +64,7 @@ aws-cli/2.1.28 Python/3.8.8 Linux/5.4.72-microsoft-standard-WSL2 exe/x86_64.cent
 ```
 
 ### 2.2. aws configure
-```
+```console
 ## 접속 설정
 $ aws configure
 AWS Access Key ID [None]:            // 1.2.2. 에서 만든 "액세스 키 ID" 값 입력
@@ -87,7 +87,7 @@ aws_secret_access_key = ABCDEFGHIJKLMNOPQRSTUVWXYZ12345678901234
 ```
 
 ## 3. jq
-```
+```console
 ## 다운로드 및 권한 설정
 $ sudo curl -L https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -o /usr/local/bin/jq
 $ sudo chmod a+x /usr/local/bin/jq
@@ -98,7 +98,7 @@ jq-1.6
 ```
 
 ## 4. git
-```
+```console
 ## yum 을 사용해서 설치
 $ sudo yum install -y git
 
@@ -108,7 +108,7 @@ git version 1.8.3.1
 ```
 
 ## 5. eksctl
-```
+```console
 ## 다운로드 및 설치
 $ sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C ./
 $ sudo mv ./eksctl /usr/local/bin
@@ -124,7 +124,7 @@ $ . ~/.bash_completion
 ```
 
 ## 6. kubectl
-```
+```console
 ## 다운로드 및 설치
 $ curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl
 $ chmod 755 kubectl
@@ -137,14 +137,14 @@ $ kubectl version --short --client
 ## 7. kubectx, kubens
 다수의 kubernetes 클러스터와 namespace 사용시 손쉬운 전환을 위해 설치
 * 참고 : https://github.com/ahmetb/kubectx
-```
+```console
 $ sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 $ sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
 $ sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 ```
 
 ## 8. helm
-```
+```console
 ## 설치 스크립트 다운로드 및 설치
 $ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
 $ chmod 700 get_helm.sh
@@ -155,14 +155,14 @@ $ ./get_helm.sh
 MFA(Multi Factor Authentication)이 적용된 환경에서는 로그인 시 2차 인증(ex. Google인증, MS Authenticator 등)을 해야 한다.
 
 awscli 환경에서도 "액세스 키 ID"와 "비밀 액세스 키"를 가지고 aws 명령 수행시 접근 거부(Access Denied) 오류가 발생한다.
-```
+```console
 ## "액세스 키 ID"와 "비밀 액세스 키"로 aws configure 된 환경에서 aws 명령 수행
 $ aws s3 ls
 An error occurred (AccessDenied) when calling the ListBuckets operation: Access Denied
 ```
 
 awscli 환경에서도 정상적인 명령 수행을 위해서는 인증코드를 활용하여 SessionToken(default 12시간 유지)을 받아서 credentials 에 적용해야 한다.
-```
+```console
 ## aws sts get-session-token 명령을 수행하여 액세스 키 ID, 비밀 액세스 키, SessionToken 값을 생성한다.
 $ aws sts get-session-token --serial-number arn:aws:iam::123456789012:mfa/iamuserid --profile default --token-code 123456
 {
@@ -191,7 +191,7 @@ $ aws s3 ls --profile mfa
 ```
 
 위 방식으로 매번 credentials 파일을 수동으로 바꾸는 번거로움을 덜기 위해 다음의 스크립트를 사용하여 자동으로 업데이트한다.
-``` 
+```bash:getsts.sh
 #!/bin/bash
 
 ### SET Account Info. ##############
