@@ -30,7 +30,7 @@ $ kubectl get all --all-namespaces
 error: You must be logged in to the server (Unauthorized)
 ```
 
-[사용자 : EKSMASTER] EKSADMIN, EKSUSER 계정 접근을 위한 IAM ROLE을 생성하는 스크립트(create_role.sh)를 작성하여 수행한다.
+[사용자 : EKSMASTER] EKSADMIN, EKSUSER 계정 접근을 위한 IAM ROLE을 생성하는 스크립트(create_role.sh)를 작성하여 수행한다.  
 (스크립트 예제) create_role.sh
 ```bash
 #!/bin/bash
@@ -127,7 +127,7 @@ d) 저장 후 신뢰할 수 있는 개체가 특정 IAM 사용자로 변경된 �
 }
 ```
   
-[사용자 : EKSMASTER] EKSUSER 계정은 특정 namespace에서만 명령 수행할 수 있도록 kubernetes role, rolebinding을 추가하는 스크립트를 작성하여 생성한다.
+[사용자 : EKSMASTER] EKSUSER 계정은 특정 namespace에서만 명령 수행할 수 있도록 kubernetes role, rolebinding을 추가하는 스크립트를 작성하여 생성한다.  
 (스크립트 예제) roleNrolebinding.sh
 ```bash
 #!/bin/bash
