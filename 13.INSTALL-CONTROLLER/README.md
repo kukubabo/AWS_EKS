@@ -1,7 +1,7 @@
-
-ingress 구성을 위한 aws-loadbalancer-controller 를 설치한다.
+# AWS-LOADBALANCER-CONTROLLER 설치
+ingress 구성을 위한 aws-loadbalancer-controller 를 설치한다.  
    
-```bash
+```console
 ## a) Add helm repository  
 $ helm repo add eks https://aws.github.io/eks-charts  
     
