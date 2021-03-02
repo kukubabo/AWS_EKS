@@ -4,7 +4,11 @@ ingress 구성을 위한 aws-loadbalancer-controller 를 설치한다.
 ```console
 ## a) Add helm repository  
 $ helm repo add eks https://aws.github.io/eks-charts  
-    
+"eks" has been added to your repositories
+$ helm repo list
+NAME            URL
+eks             https://aws.github.io/eks-charts
+   
 ## b) Install TargetGroupBinding CRD  
 $ kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"  
    
@@ -43,4 +47,19 @@ spec:
             serviceName: test-app
             servicePort: 80
 
+```
+
+
+# Nginx Ingress Controller 설치
+kubernetes 일반적으로 많이 쓰는 nginx ingress controller 를 설치한다.
+
+```console
+## a) Add helm repository
+$ helm repo add nginx-stable https://helm.nginx.com/stable
+"nginx-stable" has been added to your repositories
+$ helm repo list
+NAME            URL
+nginx-stable    https://helm.nginx.com/stable
+
+$ helm install nginx-ingress nginx-stable/nginx-ingress
 ```
