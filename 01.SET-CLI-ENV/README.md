@@ -190,8 +190,9 @@ $ aws s3 ls --profile mfa
 2021-01-29 01:48:09 test2
 ```
 
-위 방식으로 매번 credentials 파일을 수동으로 바꾸는 번거로움을 덜기 위해 다음의 스크립트를 사용하여 자동으로 업데이트한다.
-```bash:getsts.sh
+위 방식으로 매번 credentials 파일을 수동으로 바꾸는 번거로움을 덜기 위해 다음의 스크립트를 사용하여 자동으로 업데이트한다.  
+<kbd>getsts.sh</kbd>
+```bash
 #!/bin/bash
 
 ### SET Account Info. ##############
