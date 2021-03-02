@@ -40,12 +40,12 @@
 ## 1. awscli 설치
 ```bash
 ## 다운로드 및 설치
-$ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-$ unzip awscliv2.zip
-$ sudo ./aws/install
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 
 ## 기존에 설치된 awscli 를 업그레이드할 때
-$ sudo ./aws/install --update
+sudo ./aws/install --update
 
 ## 버전 확인
 $ aws --version
