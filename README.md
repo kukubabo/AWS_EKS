@@ -10,7 +10,7 @@
 [11-2. EKS 노드그룹 생성](https://github.com/kukubabo/AWS_EKS/tree/master/11.SET-EKS-ENV#eks-%EB%85%B8%EB%93%9C%EA%B7%B8%EB%A3%B9-%EC%83%9D%EC%84%B1)  
 [12. EKS 클러스터에 접근 권한 부여(IAM Role)](https://github.com/kukubabo/AWS_EKS/tree/master/12.EKS-KUBECONFIG#eks-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0%EC%97%90-%EC%A0%91%EA%B7%BC-%EA%B6%8C%ED%95%9C-%EB%B6%80%EC%97%ACiam-role)  
 [13-1. AWS-LOADBALANCER-CONTROLLER 설치](https://github.com/kukubabo/AWS_EKS/blob/master/13.INSTALL-CONTROLLER/README.md#aws-loadbalancer-controller-%EC%84%A4%EC%B9%98)  
-13-2. NGINX-INGRESS-CONTROLLER 설치(TBD)  
+[13-2. NGINX-INGRESS-CONTROLLER 설치](https://github.com/kukubabo/AWS_EKS/blob/master/13.INSTALL-CONTROLLER/README.md#nginx-ingress-controller-%EC%84%A4%EC%B9%98)  
 14-1. (모니터링) metrics-server 설치(TBD)  
 14-2. (모니터링) prometheus/grafana 설치(TBD)  
 15. (로깅) ELK(EFK) 설치(TBD)  
