@@ -71,11 +71,65 @@ NLB가 ALB 보다 좋은 점
 
 ```console
 ## a) Add helm repository
-$ helm repo add nginx-stable https://helm.nginx.com/stable
-"nginx-stable" has been added to your repositories
+$ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+"ingress-nginx" has been added to your repositories
+$ helm repo update
+
 $ helm repo list
 NAME            URL
-nginx-stable    https://helm.nginx.com/stable
+ingress-nginx   https://kubernetes.github.io/ingress-nginx
 
-$ helm install nginx-ingress nginx-stable/nginx-ingress
+## b-1) install ingress-nginx ( 외부 서비스용 )
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+    --namespace kube-system \
+	--set controller.hostNetwork=true \
+	--set controller.containerPort.http=80 \
+	--set controller.containerPort.https=443 \
+	--set controller.kind=DaemonSet \
+	--set controller.hostPort.enabled=true \
+	--set controller.hostPort.ports.http=80 \
+	--set controller.hostPort.ports.https=443 \
+	--set controller.electionID="ingress-controller-leader-external" \
+	--set controller.ingressClass="nginx" \
+	--set controller.podLabels.app="ingress-nginx-external" \
+	--set controller.admissionWebhooks.port=8443 \
+	--set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type=nlb \
+	--set defaultBackend.enabled=true
+
+## b-2) install ingress-nginx ( 내부 서비스용 )
+helm install ingress-nginx-internal ingress-nginx/ingress-nginx \
+    --namespace kube-system \
+	--set controller.hostNetwork=true \
+	--set controller.containerPort.http=10080 \
+	--set controller.containerPort.https=10443 \
+	--set controller.kind=DaemonSet \
+	--set controller.hostPort.enabled=true \
+	--set controller.hostPort.ports.http=10080 \
+	--set controller.hostPort.ports.https=10443 \
+	--set controller.electionID="ingress-controller-leader-internal" \
+	--set controller.ingressClass="nginx-internal" \
+	--set controller.podLabels.app="ingress-nginx-internal" \
+	--set controller.admissionWebhooks.port=18443 \
+	--set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type=nlb \
+	--set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-internal=true \
+	--set defaultBackend.enabled=true
+
+## b-3) external 서비스용 ( 고정 E-IP NLB 사용, Daemonset )   ==== annoation 안 먹어서 추가 테스트 필요
+helm install ingress-nginx-eip ingress-nginx/ingress-nginx \
+    --namespace kube-system \
+	--set controller.hostNetwork=true \
+	--set controller.containerPort.http=20080 \
+	--set controller.containerPort.https=20443 \
+	--set controller.kind=DaemonSet \
+	--set controller.hostPort.enabled=true \
+	--set controller.hostPort.ports.http=20080 \
+	--set controller.hostPort.ports.https=20443 \
+	--set controller.electionID="ingress-controller-leader-eip" \
+	--set controller.ingressClass="nginx-eip" \
+	--set controller.podLabels.app="ingress-nginx-eip" \
+	--set controller.admissionWebhooks.port=28443 \
+	--set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type=nlb \
+	--set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-eip-allocations="eipalloc-07ef75724516085ca,eipalloc-0181202a7c68c88d7" \
+	--set defaultBackend.enabled=true
 ```
+
