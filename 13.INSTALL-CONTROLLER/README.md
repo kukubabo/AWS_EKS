@@ -60,7 +60,7 @@ AWS-LOADBALANCER-CONTROLLER 대신 nginx ingress controller 를 선택하는 이
 ```
 ```
 NLB가 ALB 보다 좋은 점  
-. Static IP/elastic IP addresses 사용이 가능  
+. Static IP/elastic IP addresses 사용이 가능 
 . scaling 을 통한 확장성이 용이  
 . Available Zone 제어(?) 가능  
 . Source IP 주소 보존(preservation) 가능? ( ALB에선 안되는지 확인 필요 )  
@@ -133,3 +133,6 @@ helm install ingress-nginx-eip ingress-nginx/ingress-nginx \
 	--set defaultBackend.enabled=true
 ```
 
+참고)  
+https://kubernetes.github.io/ingress-nginx/deploy/#aws
+https://aws.amazon.com/ko/blogs/korea/using-static-ip-addresses-for-application-load-balancers/
