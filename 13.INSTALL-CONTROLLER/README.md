@@ -51,7 +51,23 @@ spec:
 
 
 # Nginx Ingress Controller 설치
-kubernetes 일반적으로 많이 쓰는 nginx ingress controller 를 설치한다.
+kubernetes 일반적으로 많이 쓰는 nginx ingress controller 를 설치한다.  
+```
+AWS-LOADBALANCER-CONTROLLER 대신 nginx ingress controller 를 선택하는 이유  
+. ALB 기능이 훌륭(great)하지만 nginx ingress controller 가 사용하는 NLB가 더 적합한 사례가 있기 때문  
+. nginx ingress controller 는 모든 요청을 받아 namespace, app별 분기하는 중앙 집중식 라우팅 방식으로 관리할 수 있기 때문  
+  (AWS-LOADBALANCER-CONTROLLER 는 ingress 생성시 전용 alb가 생성되는 개별관리 방식)  
+```
+```
+NLB가 ALB 보다 좋은 점  
+. Static IP/elastic IP addresses 사용이 가능  
+. scaling 을 통한 확장성이 용이  
+. Available Zone 제어(?) 가능  
+. Source IP 주소 보존(preservation) 가능? ( ALB에선 안되는지 확인 필요 )  
+. Long-lived TCP 연결 가능  
+. 대역폭 사용량 감소 : ALB, CLB 에 비해 약 25% 사용량 감소  
+. SSL termination : SSL termination will need to happen at the backend, since SSL termination on NLB for Kubernetes is not yet available.  
+```
 
 ```console
 ## a) Add helm repository
