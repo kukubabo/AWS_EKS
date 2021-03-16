@@ -132,6 +132,30 @@ helm install ingress-nginx-eip ingress-nginx/ingress-nginx \
 	--set controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-eip-allocations="eipalloc-07ef75724516085ca,eipalloc-0181202a7c68c88d7" \
 	--set defaultBackend.enabled=true
 ```
+샘플 ingress 코드)
+```yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  name: example
+  namespace: foo
+spec:
+  rules:
+    - host: www.example.com
+      http:
+        paths:
+          - backend:
+              serviceName: exampleService
+              servicePort: 80
+            path: /
+  # This section is only required if TLS is to be enabled for the Ingress
+  tls:
+      - hosts:
+          - www.example.com
+        secretName: example-tls
+```
 
 참고)  
 https://kubernetes.github.io/ingress-nginx/deploy/#aws
