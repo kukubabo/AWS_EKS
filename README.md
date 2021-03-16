@@ -12,7 +12,7 @@
 [13-1. AWS-LOADBALANCER-CONTROLLER 설치](https://github.com/kukubabo/AWS_EKS/blob/master/13.INSTALL-CONTROLLER/README.md#aws-loadbalancer-controller-%EC%84%A4%EC%B9%98)  
 [13-2. NGINX-INGRESS-CONTROLLER 설치](https://github.com/kukubabo/AWS_EKS/blob/master/13.INSTALL-CONTROLLER/README.md#nginx-ingress-controller-%EC%84%A4%EC%B9%98)  
 [14-1. (모니터링) metrics-server 설치](https://github.com/kukubabo/AWS_EKS/tree/master/14.MONITORING#metrics-server-%EC%84%A4%EC%B9%98)  
-14-2. (모니터링) prometheus/grafana 설치(TBD)  
+[14-2. (모니터링) prometheus/grafana 설치](https://github.com/kukubabo/AWS_EKS/tree/master/14.MONITORING#prometheus-%EC%84%A4%EC%B9%98--with-alertrules-)  
 15. (로깅) ELK(EFK) 설치(TBD)  
 16. ISTIO 설치/구성(TBD)  
 17. CICD 구성(TBD)  
