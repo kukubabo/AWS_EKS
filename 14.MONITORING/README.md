@@ -9,7 +9,7 @@ $ wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/downloa
 ```
 
 ## 2. components.yaml파일의 container 설정에 'hostNetwork: true' 추가  
-> calico 등 layout 네트워크 구성시 POD IP를 node IP로 설정해야 정상 작동하기 때문에 기본 설정으로 추가해준다.
+> calico 등 overlay 네트워크 구성시 POD IP를 node IP로 설정해야 정상 작동하기 때문에 기본 설정으로 추가해준다.
 ```console
 ## 추가
 $ sed -i '170 a \      hostNetwork: true' components.yaml
